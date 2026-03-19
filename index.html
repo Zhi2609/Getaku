@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../GeOtaku/Style.css" />
+    <title>Explorador de Países, Clima y Anime</title>
+  </head>
+  <body>
+    <h1>Explorador de Países</h1>
+    <div id="contenedor-tarjetas" class="contenedor-tarjetas"></div>
+
+    <script>
+      // NOTA: Si apicountries.com falla, puedes probar usando: 'https://restcountries.com/v3.1/lang/spanish'
+      const API_PAISES = "https://restcountries.com/v3.1/lang/spanish";
+      const WEATHERSTACK_KEY = "eedcd92db124cc48fe79f43c2abd8461";
+      const API_ANIME = "https://api.jikan.moe/v4/random/anime";
+
+      async function cargarPaises() {
+        try {
+          const respuesta = await fetch(API_PAISES);
+          const datos = await respuesta.json();
+
+          const primeros10 = datos.slice(0, 10);
+          renderizarTarjetas(primeros10);
+        } catch (error) {
+          console.error(
+            "Error al cargar los países. Verifica la URL de la API.",
+            error,
+          );
+        }
+      }
+
+      function renderizarTarjetas(paises) {
+        const contenedor = document.getElementById("contenedor-tarjetas");
+
+        paises.forEach((pais) => {
+          const nombre = pais.name?.common || pais.name || "Desconocido";
+          const capital = pais.capital ? pais.capital[0] : "No tiene";
+          const region = pais.region || "Desconocida";
+          const poblacion = pais.population
+            ? pais.population.toLocaleString()
+            : "N/A";
+          const banderaUrl =
+            pais.flags?.png ||
+            pais.flag ||
+            "https://via.placeholder.com/300x150?text=Sin+Bandera";
+
+          const tarjeta = document.createElement("div");
+          tarjeta.className = "tarjeta";
+
+          tarjeta.innerHTML = `
+                    <img src="${banderaUrl}" alt="Bandera de ${nombre}" class="bandera">
+                    <div class="datos-pais">
+                        <h3>${nombre}</h3>
+                        <p><strong>Capital:</strong> ${capital}</p>
+                        <p><strong>Región:</strong> ${region}</p>
+                        <p><strong>Población:</strong> ${poblacion}</p>
+                    </div>
+                    
+                    <button onclick="cargarClima('${nombre}', this)">⛅ Ver Clima Actual</button>
+                    <div class="info-clima"></div>
+
+                    <button class="btn-foto" onclick="mostrarFoto('${nombre}', this)">📸 Ver Paisaje</button>
+                    <div id="contenedor-foto">
+                        <img class="foto-paisaje" src="" alt="Paisaje de ${nombre}">
+                    </div>
+                `;
+
+          contenedor.appendChild(tarjeta);
+        });
+      }
+
+      async function cargarClima(nombrePais, botonElemento) {
+        const contenedorClima = botonElemento.nextElementSibling;
+        contenedorClima.style.display = "block";
+        contenedorClima.innerHTML = "Cargando clima... ⏳";
+
+        try {
+          const url = `http://api.weatherstack.com/current?access_key=${WEATHERSTACK_KEY}&query=${nombrePais}`;
+          const respuesta = await fetch(url);
+          const datos = await respuesta.json();
+
+          if (datos.error) {
+            contenedorClima.innerHTML = `Error: ${datos.error.info}`;
+            return;
+          }
+
+          const clima = datos.current;
+          contenedorClima.innerHTML = `
+                    <img src="${clima.weather_icons[0]}" alt="Icono clima" class="icono-clima">
+                    <p><strong>Temperatura:</strong> ${clima.temperature}°C</p>
+                    <p><strong>Condición:</strong> ${clima.weather_descriptions[0]}</p>
+                    <p><strong>Humedad:</strong> ${clima.humidity}%</p>
+                    <p><strong>Viento:</strong> ${clima.wind_speed} km/h</p>
+                    <p><strong>Presión:</strong> ${clima.pressure} mb</p>
+                `;
+        } catch (error) {
+          contenedorClima.innerHTML = "Error al conectar con el clima.";
+          console.error(error);
+        }
+      }
+
+      function mostrarFoto(nombrePais, botonElemento) {
+        const imgElemento = botonElemento.nextElementSibling.querySelector('.foto-paisaje');
+        
+        const urlImagen = `https://source.unsplash.com/featured/400x300?nature,${nombrePais}`;
+        
+        imgElemento.src = urlImagen;
+        imgElemento.style.display = 'block';
+        
+        botonElemento.innerText = "¡Paisaje Cargado! ✨";
+        botonElemento.disabled = true;
+    }
+      cargarPaises();
+    </script>
+  </body>
+</html>
