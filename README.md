@@ -22,7 +22,6 @@ Este proyecto fue construido utilizando tecnologías web estándar para garantiz
 * **APIs Externas:**
     * *Información Geográfica:* Consulta de países por idioma.
     * *Weatherstack API:* Datos meteorológicos en tiempo real.
-    * *Jikan API (MyAnimeList):* Motor de recomendaciones de anime.
 
 ---
 
