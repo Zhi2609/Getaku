@@ -1,4 +1,4 @@
-# Getaku: Explorer & Weather Dashboard 🌍✨
+# Getaku: Explorer & Weather Dashboard 
 
 **GeoOtaku** es una aplicación web interactiva que permite a los usuarios explorar datos globales de una manera única. El proyecto conecta la información geográfica de diversos países con reportes meteorológicos en tiempo real y, para añadir un toque de cultura pop, ofrece recomendaciones aleatorias de anime para cada destino.
 
